@@ -1,6 +1,7 @@
 package com.xiaopo.flying.sticker;
 
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IntRange;
@@ -26,6 +27,11 @@ public class DrawableSticker extends Sticker {
   @Override public DrawableSticker setDrawable(@NonNull Drawable drawable) {
     this.drawable = drawable;
     return this;
+  }
+
+  @Override
+  public void setCenterPointXY(PointF currentCenterPoint) {
+
   }
 
   @Override public void draw(@NonNull Canvas canvas) {
