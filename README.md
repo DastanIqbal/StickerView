@@ -54,7 +54,21 @@ heartIcon.setIconEvent(new HelloIconEvent());
 
 stickerView.setIcons(Arrays.asList(deleteIcon, zoomIcon, flipIcon, heartIcon));
 ```
-
+## Set TextSticker on x,y location from oldView to newView
+```java
+            TextSticker sticker = new TextSticker(this);
+            sticker.setDrawable(ContextCompat.getDrawable(getApplicationContext(),
+                    R.drawable.sticker_transparent_background));
+            sticker.setText("Hello TextSticker");
+            sticker.setTextColor(Color.parseColor("#ffeedd"));
+            sticker.setTypefaceFromFile("/system/fonts/Roboto-Medium.ttf");
+            sticker.setTextAlign(Layout.Alignment.ALIGN_CENTER);
+            sticker.setManualXY(true);
+            sticker.setMainViewWidth(oldView.getMainViewWidth());
+            sticker.setMainViewHeight(oldView.getMainViewHeight());
+            sticker.resizeText();
+            activityVidEditBinding.vidView.stickerView.addSticker(sticker, oldView.getOrigXY());
+```
 ## Update
 
 * **2016/10/11** Add horizontal flip function.
