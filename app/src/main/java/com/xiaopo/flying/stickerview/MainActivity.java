@@ -226,6 +226,6 @@ public class MainActivity extends AppCompatActivity {
     sticker.setTextAlign(Layout.Alignment.ALIGN_CENTER);
     sticker.resizeText();
 
-    stickerView.addSticker(sticker);
+    stickerView.addSticker(sticker, Sticker.Position.TOP);
   }
 }

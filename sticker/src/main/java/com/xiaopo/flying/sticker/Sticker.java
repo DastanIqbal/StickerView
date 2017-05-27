@@ -18,6 +18,10 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class Sticker {
 
+    private boolean manualXY = false;
+    private PointF absolutePointF = new PointF();
+    private float mainViewWidth, mainViewHeight;
+
     public abstract void setCenterPointXY(PointF currentCenterPoint);
 
     @IntDef(flag = true, value = {
@@ -203,6 +207,14 @@ public abstract class Sticker {
         dst.set(mappedPoints[0], mappedPoints[1]);
     }
 
+    public void getMappedXYPoint(@NonNull PointF dst, @NonNull float[] mappedPoints,
+                                 @NonNull float[] src) {
+        src[0] = dst.x;
+        src[1] = dst.y;
+        getMappedPoints(mappedPoints, src);
+        dst.set(mappedPoints[0], mappedPoints[1]);
+    }
+
     public float getCurrentScale() {
         return getMatrixScale(matrix);
     }
@@ -259,5 +271,38 @@ public abstract class Sticker {
     }
 
     public void release() {
+    }
+
+    public void setManualXY(boolean manualXY) {
+        this.manualXY = manualXY;
+    }
+
+    public boolean isManualXY() {
+        return manualXY;
+    }
+
+    public void setAbsoluteXY(float x, float y) {
+        absolutePointF.x = x;
+        absolutePointF.y = y;
+    }
+
+    public PointF getAbsoluteXY() {
+        return new PointF(absolutePointF.x, absolutePointF.y);
+    }
+
+    public float getMainViewWidth() {
+        return mainViewWidth;
+    }
+
+    public void setMainViewWidth(float mainViewWidth) {
+        this.mainViewWidth = mainViewWidth;
+    }
+
+    public float getMainViewHeight() {
+        return mainViewHeight;
+    }
+
+    public void setMainViewHeight(float mainViewHeight) {
+        this.mainViewHeight = mainViewHeight;
     }
 }

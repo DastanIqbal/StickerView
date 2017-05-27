@@ -37,8 +37,8 @@ import java.util.List;
  */
 public class StickerView extends FrameLayout {
 
-    private final boolean showIcons;
-    private final boolean showBorder;
+    private boolean showIcons;
+    private boolean showBorder;
     private final boolean bringToFrontCurrentSticker;
     private float borderHeight;
 
@@ -81,8 +81,8 @@ public class StickerView extends FrameLayout {
     // region storing variables
     private final float[] bitmapPoints = new float[8];
     private final float[] bounds = new float[8];
-    private final float[] point = new float[2];
-    private final PointF currentCenterPoint = new PointF();
+    private float[] point = new float[2];
+    private PointF currentCenterPoint = new PointF();
     private final float[] tmp = new float[2];
     private PointF midPoint = new PointF();
     // endregion
@@ -226,9 +226,10 @@ public class StickerView extends FrameLayout {
             float x4 = bitmapPoints[6];
             float y4 = bitmapPoints[7];
 
+            handlingSticker.setAbsoluteXY(x3, y3);
             borderHeight = y3 - y1;
             Log.d(TAG, borderHeight + "");
-            
+
             if (showBorder) {
                 canvas.drawLine(x1, y1, x2, y2, borderLinePaint);
                 canvas.drawLine(x1, y1, x3, y3, borderLinePaint);
@@ -485,8 +486,8 @@ public class StickerView extends FrameLayout {
         }
 
         sticker.setCenterPointXY(currentCenterPoint);
-        Log.d(TAG, width + ":::::" + height);
-        Log.d(TAG, currentCenterPoint.x + ":::::" + currentCenterPoint.y);
+        Log.d(TAG, "Size " + width + ":::::" + height);
+        Log.d(TAG, "Center Point: " + currentCenterPoint.x + ":::::" + currentCenterPoint.y);
         sticker.getMatrix().postTranslate(moveX, moveY);
     }
 
@@ -584,7 +585,7 @@ public class StickerView extends FrameLayout {
         super.onSizeChanged(w, h, oldW, oldH);
         for (int i = 0; i < stickers.size(); i++) {
             Sticker sticker = stickers.get(i);
-            if (sticker != null) {
+            if (sticker != null && !sticker.isManualXY()) {
                 transformSticker(sticker);
             }
         }
@@ -729,6 +730,21 @@ public class StickerView extends FrameLayout {
         return addSticker(sticker, Sticker.Position.CENTER);
     }
 
+    @NonNull
+    public StickerView addSticker(@NonNull final Sticker sticker, final PointF pointF) {
+        if (ViewCompat.isLaidOut(this)) {
+            addStickerImmediately(sticker, pointF);
+        } else {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    addStickerImmediately(sticker, pointF);
+                }
+            });
+        }
+        return this;
+    }
+
     public StickerView addSticker(@NonNull final Sticker sticker,
                                   final @Sticker.Position int position) {
         if (ViewCompat.isLaidOut(this)) {
@@ -747,6 +763,42 @@ public class StickerView extends FrameLayout {
     protected void addStickerImmediately(@NonNull Sticker sticker, @Sticker.Position int position) {
         setStickerPosition(sticker, position);
 
+
+        float scaleFactor, widthScaleFactor, heightScaleFactor;
+
+        widthScaleFactor = (float) getWidth() / sticker.getDrawable().getIntrinsicWidth();
+        heightScaleFactor = (float) getHeight() / sticker.getDrawable().getIntrinsicHeight();
+        scaleFactor = widthScaleFactor > heightScaleFactor ? heightScaleFactor : widthScaleFactor;
+
+        sticker.getMatrix()
+                .postScale(scaleFactor / 2, scaleFactor / 2, getWidth() / 2, getHeight() / 2);
+
+        handlingSticker = sticker;
+        stickers.add(sticker);
+        if (onStickerOperationListener != null) {
+            constrainSticker(sticker);
+            onStickerOperationListener.onStickerAdded(sticker);
+        }
+        invalidate();
+    }
+
+    protected void addStickerImmediately(@NonNull Sticker sticker, PointF pointF) {
+        float width = getWidth();
+        float height = getHeight();
+
+        float aspectRationX = width / sticker.getMainViewWidth();  // get aspectRatio for width to calculate correct location
+        float aspectRationY = height / sticker.getMainViewHeight(); // get aspectRatio for width to calculate correct location
+
+        float offsetValueX = (width - sticker.getWidth()) / 2f; // offset ValueX
+        float offsetValueY = (height - sticker.getHeight()) / 2f; // offset valueY
+
+        float offsetRatio = (width / sticker.getWidth()) / 2; // offset Ratio
+
+        //convert point into current dimension, subtract from center, divide by offsetRatio & add center offset values
+        float offsetX = ((pointF.x * aspectRationX - width / 2f) / offsetRatio) + offsetValueX;
+        float offsetY = ((pointF.y * aspectRationY - height / 2f) / offsetRatio) + offsetValueY;
+
+        sticker.getMatrix().postTranslate(offsetX, offsetY);
 
         float scaleFactor, widthScaleFactor, heightScaleFactor;
 
@@ -785,6 +837,8 @@ public class StickerView extends FrameLayout {
         } else {
             offsetX /= 2f;
         }
+        //  offsetX = 20f;
+        //  offsetY = 448.5f;
         sticker.getMatrix().postTranslate(offsetX, offsetY);
     }
 
@@ -915,6 +969,14 @@ public class StickerView extends FrameLayout {
 
     public float getBorderHeight() {
         return borderHeight;
+    }
+
+    public void setShowIcons(boolean showIcons) {
+        this.showIcons = showIcons;
+    }
+
+    public void setShowBorder(boolean showBorder) {
+        this.showBorder = showBorder;
     }
 
     public interface OnStickerOperationListener {

@@ -127,8 +127,6 @@ public class TextSticker extends Sticker {
         staticLayout.draw(canvas);
         canvas.restore();
         resizeText();
-        Log.d(TAG, "Bounds Padding: " + staticLayout.getTopPadding() + " " + staticLayout.getBottomPadding());
-        Log.d(TAG, "Sticker Dime " + getCurrentWidth() + " " + getCurrentHeight() + " " + getCurrentScale());
     }
 
     @Override
@@ -207,7 +205,7 @@ public class TextSticker extends Sticker {
 
     public String getTextColor() {
         int color = textPaint.getColor();
-        return Integer.toHexString(color).substring(2);
+        return "#" + Integer.toHexString(color).substring(2);
     }
 
     @NonNull
@@ -218,7 +216,7 @@ public class TextSticker extends Sticker {
 
     @NonNull
     public TextSticker setMaxTextSize(@Dimension(unit = Dimension.SP) float size) {
-        textPaint.setTextSize(convertSpToPx(size));
+        textPaint.setTextSize(size);//convertSpToPx(size));
         maxTextSizePixels = textPaint.getTextSize();
         return this;
     }
@@ -260,9 +258,7 @@ public class TextSticker extends Sticker {
     @NonNull
     public TextSticker resizeText() {
         final int availableHeightPixels = (int) getCurrentHeight();
-
         final int availableWidthPixels = (int) getCurrentWidth();
-
         final CharSequence text = getText();
 
         // Safety check
@@ -274,61 +270,63 @@ public class TextSticker extends Sticker {
                 || maxTextSizePixels <= 0) {
             return this;
         }
-
-        float targetTextSizePixels = maxTextSizePixels;
-        int targetTextHeightPixels =
-                getTextHeightPixels(text, availableWidthPixels, targetTextSizePixels);
-        Log.d("TextSticker", targetTextHeightPixels + "");
-        // Until we either fit within our TextView
-        // or we have reached our minimum text size,
-        // incrementally try smaller sizes
-        while (targetTextHeightPixels > availableHeightPixels
-                && targetTextSizePixels > minTextSizePixels) {
-            targetTextSizePixels = Math.max(targetTextSizePixels - 2, minTextSizePixels);
-
-            targetTextHeightPixels =
+        if (!isManualXY()) {
+            float targetTextSizePixels = maxTextSizePixels;
+            int targetTextHeightPixels =
                     getTextHeightPixels(text, availableWidthPixels, targetTextSizePixels);
-        }
+            Log.d("TextSticker", targetTextHeightPixels + "");
+            // Until we either fit within our TextView
+            // or we have reached our minimum text size,
+            // incrementally try smaller sizes
+            while (targetTextHeightPixels > availableHeightPixels
+                    && targetTextSizePixels > minTextSizePixels) {
+                targetTextSizePixels = Math.max(targetTextSizePixels - 2, minTextSizePixels);
 
-        // If we have reached our minimum text size and the text still doesn't fit,
-        // append an ellipsis
-        // (NOTE: Auto-ellipsize doesn't work hence why we have to do it here)
-        if (targetTextSizePixels == minTextSizePixels
-                && targetTextHeightPixels > availableHeightPixels) {
-            // Make a copy of the original TextPaint object for measuring
-            TextPaint textPaintCopy = new TextPaint(textPaint);
-            textPaintCopy.setTextSize(targetTextSizePixels);
+                targetTextHeightPixels =
+                        getTextHeightPixels(text, availableWidthPixels, targetTextSizePixels);
+            }
 
-            // Measure using a StaticLayout instance
-            StaticLayout staticLayout =
-                    new StaticLayout(text, textPaintCopy, availableWidthPixels, Layout.Alignment.ALIGN_NORMAL,
-                            lineSpacingMultiplier, lineSpacingExtra, false);
+            // If we have reached our minimum text size and the text still doesn't fit,
+            // append an ellipsis
+            // (NOTE: Auto-ellipsize doesn't work hence why we have to do it here)
+            if (targetTextSizePixels == minTextSizePixels
+                    && targetTextHeightPixels > availableHeightPixels) {
+                // Make a copy of the original TextPaint object for measuring
+                TextPaint textPaintCopy = new TextPaint(textPaint);
+                textPaintCopy.setTextSize(targetTextSizePixels);
 
-            // Check that we have a least one line of rendered text
-            if (staticLayout.getLineCount() > 0) {
-                // Since the line at the specific vertical position would be cut off,
-                // we must trim up to the previous line and add an ellipsis
-                int lastLine = staticLayout.getLineForVertical(availableHeightPixels) - 1;
+                // Measure using a StaticLayout instance
+                StaticLayout staticLayout =
+                        new StaticLayout(text, textPaintCopy, availableWidthPixels, Layout.Alignment.ALIGN_NORMAL,
+                                lineSpacingMultiplier, lineSpacingExtra, false);
 
-                if (lastLine >= 0) {
-                    int startOffset = staticLayout.getLineStart(lastLine);
-                    int endOffset = staticLayout.getLineEnd(lastLine);
-                    float lineWidthPixels = staticLayout.getLineWidth(lastLine);
-                    float ellipseWidth = textPaintCopy.measureText(mEllipsis);
+                // Check that we have a least one line of rendered text
+                if (staticLayout.getLineCount() > 0) {
+                    // Since the line at the specific vertical position would be cut off,
+                    // we must trim up to the previous line and add an ellipsis
+                    int lastLine = staticLayout.getLineForVertical(availableHeightPixels) - 1;
+                    if (lastLine >= 0) {
+                        int startOffset = staticLayout.getLineStart(lastLine);
+                        int endOffset = staticLayout.getLineEnd(lastLine);
+                        float lineWidthPixels = staticLayout.getLineWidth(lastLine);
+                        float ellipseWidth = textPaintCopy.measureText(mEllipsis);
 
-                    // Trim characters off until we have enough room to draw the ellipsis
-                    while (availableWidthPixels < lineWidthPixels + ellipseWidth) {
-                        endOffset--;
-                        lineWidthPixels =
-                                textPaintCopy.measureText(text.subSequence(startOffset, endOffset + 1).toString());
+                        // Trim characters off until we have enough room to draw the ellipsis
+                        while (availableWidthPixels < lineWidthPixels + ellipseWidth) {
+                            endOffset--;
+                            lineWidthPixels =
+                                    textPaintCopy.measureText(text.subSequence(startOffset, endOffset + 1).toString());
+                        }
+
+                        setText(text.subSequence(0, endOffset) + mEllipsis);
                     }
-
-                    setText(text.subSequence(0, endOffset) + mEllipsis);
                 }
             }
+
+            textPaint.setTextSize(targetTextSizePixels);
         }
-        textPaint.setTextSize(targetTextSizePixels);
         textSize = textPaint.getTextSize();
+
         staticLayout =
                 new StaticLayout(this.text, textPaint, textRect.width(), alignment, lineSpacingMultiplier,
                         lineSpacingExtra, false);
@@ -381,11 +379,19 @@ public class TextSticker extends Sticker {
         this.centerPointXY = pointF;
     }
 
-    public PointF getTextCoordinate() {
+    private PointF getTextCoordinate() {
         Rect bounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), bounds); //get first character
         PointF pointF = new PointF(bounds.width(), bounds.height());
         Log.d("TextSticker", pointF + "");
+        return pointF;
+    }
+
+    private PointF getSingleTextDimen() {
+        Rect bounds = new Rect();
+        textPaint.getTextBounds(text, 0, 1, bounds); //get first character
+        PointF pointF = new PointF(bounds.width(), bounds.height());
+        Log.d("TextSticker", "SingleTextDim " + pointF);
         return pointF;
     }
 
@@ -396,6 +402,16 @@ public class TextSticker extends Sticker {
     public PointF getCenterPointXY() {
         PointF point = getTextCoordinate();
         return new PointF(centerPointXY.x, centerPointXY.y /*- point.y*/);
+    }
+
+    public PointF getOrigPoint() {
+        return new PointF(centerPointXY.x, centerPointXY.y);
+    }
+
+    public PointF getPointXY() {
+        PointF point = getTextCoordinate();
+        int textLength = (int) Math.floor(textPaint.measureText(text, 0, text.length()));
+        return new PointF(centerPointXY.x, centerPointXY.y);
     }
 
     public void setDurationStart(float durationStart) {
