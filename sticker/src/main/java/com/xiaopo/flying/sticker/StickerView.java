@@ -227,15 +227,15 @@ public class StickerView extends FrameLayout {
             float y4 = bitmapPoints[7];
 
             handlingSticker.setAbsoluteXY(x3, y3);
-            borderHeight = y3 - y1;
-            Log.d(TAG, borderHeight + "");
+//            borderHeight = y3 - y1;
+//            Log.d(TAG, "BorderHeight " + borderHeight);
+//            Log.d(TAG, "BorderWidth " + (x2 - x1));
 
             if (showBorder) {
                 canvas.drawLine(x1, y1, x2, y2, borderLinePaint);
                 canvas.drawLine(x1, y1, x3, y3, borderLinePaint);
                 canvas.drawLine(x2, y2, x4, y4, borderLinePaint);
                 canvas.drawLine(x4, y4, x3, y3, borderLinePaint);
-                Log.d(TAG, "");
             }
 
             //draw icons

@@ -1,5 +1,6 @@
 package com.xiaopo.flying.sticker;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
@@ -9,6 +10,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,12 +18,20 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * @author wupanjie
  */
-public abstract class Sticker {
+public abstract class Sticker1 extends View {
 
     private boolean manualXY = false;
     private PointF absolutePointF = new PointF();
     private float mainViewWidth, mainViewHeight;
     private int textSizeVal;
+
+    public Sticker1(Context context) {
+        super(context);
+    }
+
+    public Sticker1(Context context, Drawable drawable) {
+        super(context);
+    }
 
     public abstract void setCenterPointXY(PointF currentCenterPoint);
 
@@ -52,7 +62,7 @@ public abstract class Sticker {
     }
 
     @NonNull
-    public Sticker setFlippedHorizontally(boolean flippedHorizontally) {
+    public Sticker1 setFlippedHorizontally(boolean flippedHorizontally) {
         isFlippedHorizontally = flippedHorizontally;
         return this;
     }
@@ -62,7 +72,7 @@ public abstract class Sticker {
     }
 
     @NonNull
-    public Sticker setFlippedVertically(boolean flippedVertically) {
+    public Sticker1 setFlippedVertically(boolean flippedVertically) {
         isFlippedVertically = flippedVertically;
         return this;
     }
@@ -72,24 +82,24 @@ public abstract class Sticker {
         return matrix;
     }
 
-    public Sticker setMatrix(@Nullable Matrix matrix) {
+    public Sticker1 setMatrix(@Nullable Matrix matrix) {
         this.matrix.set(matrix);
         return this;
     }
 
-    public abstract void draw(@NonNull Canvas canvas);
+    public abstract void stickerDraw(@NonNull Canvas canvas);
 
-    public abstract int getWidth();
+    public abstract int getSWidth();
 
-    public abstract int getHeight();
+    public abstract int getSHeight();
 
-    public abstract Sticker setDrawable(@NonNull Drawable drawable);
+    public abstract Sticker1 setDrawable(@NonNull Drawable drawable);
 
     @NonNull
     public abstract Drawable getDrawable();
 
     @NonNull
-    public abstract Sticker setAlpha(@IntRange(from = 0, to = 255) int alpha);
+    public abstract Sticker1 setAlpha(@IntRange(from = 0, to = 255) int alpha);
 
     public float[] getBoundPoints() {
         float[] points = new float[8];
@@ -309,8 +319,7 @@ public abstract class Sticker {
 
     public void scaleSticker(float scalefactor) {
         float currentScale = getCurrentScale();
-        if (scalefactor < currentScale) scalefactor = 1;
-        matrix.preScale(currentScale + scalefactor, currentScale + scalefactor, getCenterPoint().x,
+        matrix.postScale(currentScale + scalefactor, currentScale + scalefactor, getCenterPoint().x,
                 getCenterPoint().y);
         setMatrix(matrix);
     }
