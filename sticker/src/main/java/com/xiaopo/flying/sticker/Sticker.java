@@ -22,8 +22,17 @@ public abstract class Sticker {
     private PointF absolutePointF = new PointF();
     private float mainViewWidth, mainViewHeight;
     private int textSizeVal;
+    private boolean isAdded;
 
     public abstract void setCenterPointXY(PointF currentCenterPoint);
+
+    public void setIsAdded(boolean b) {
+        isAdded = b;
+    }
+
+    public boolean isAdded() {
+        return isAdded;
+    }
 
     @IntDef(flag = true, value = {
             Position.CENTER, Position.TOP, Position.BOTTOM, Position.LEFT, Position.RIGHT

@@ -131,11 +131,6 @@ public class TextSticker extends Sticker {
         Log.d(TAG, "TextSize: " + textPaint.getTextSize() + " Scale:" + getCurrentScale() + " " + textPaint.getTextScaleX());
         Log.d(TAG, "WxHxS: " + getCurrentWidth() + "x" + getCurrentHeight() + "x" + getCurrentWidth() / getCurrentHeight());
         canvas.restore();
-
-        if(!isManualXY()) {
-            calulateTextSize();
-            textPaint.setTextSize(textSize);
-        }
     }
 
     @Override
@@ -408,8 +403,8 @@ public class TextSticker extends Sticker {
         }
 
         calculatedTextSize = targetTextSizePixels;
+        textPaint.setTextSize(textSize);
         Log.d("TextSticker", "TextSizePixels 1 " + calculatedTextSize + " in SP " + convertPxToSp(targetTextSizePixels));
-        return;
     }
 
     /**
@@ -525,7 +520,7 @@ public class TextSticker extends Sticker {
     }
 
     public float getCalculatedTextSize() {
-        if (calculatedTextSize == 0) return convertPxToSp(textSize);
-        return convertPxToSp(calculatedTextSize);
+        if (calculatedTextSize == 0) return textSize;
+        return calculatedTextSize;
     }
 }

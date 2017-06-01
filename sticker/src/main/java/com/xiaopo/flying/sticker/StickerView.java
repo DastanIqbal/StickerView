@@ -41,6 +41,7 @@ public class StickerView extends FrameLayout {
     private boolean showBorder;
     private final boolean bringToFrontCurrentSticker;
     private float borderHeight;
+    private boolean doChangeSurface = true;
 
     @IntDef({
             ActionMode.NONE, ActionMode.DRAG, ActionMode.ZOOM_WITH_TWO_FINGER, ActionMode.ICON,
@@ -585,7 +586,7 @@ public class StickerView extends FrameLayout {
         super.onSizeChanged(w, h, oldW, oldH);
         for (int i = 0; i < stickers.size(); i++) {
             Sticker sticker = stickers.get(i);
-            if (sticker != null && !sticker.isManualXY()) {
+            if (sticker != null && !sticker.isManualXY() && !sticker.isAdded()) {
                 transformSticker(sticker);
             }
         }
@@ -993,5 +994,9 @@ public class StickerView extends FrameLayout {
         void onStickerFlipped(@NonNull Sticker sticker);
 
         void onStickerDoubleTapped(@NonNull Sticker sticker);
+    }
+
+    public void doChangeSurface(boolean b) {
+        this.doChangeSurface = b;
     }
 }
