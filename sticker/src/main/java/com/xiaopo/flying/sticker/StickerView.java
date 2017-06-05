@@ -282,9 +282,7 @@ public class StickerView extends FrameLayout {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (locked) {
-            if (onStickerOperationListener != null) {
-                onStickerOperationListener.onStickerClicked(handlingSticker);
-            }
+            locked = false;
             return super.onInterceptTouchEvent(ev);
         }
 
@@ -301,7 +299,7 @@ public class StickerView extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (locked) {
+        if (locked /*|| (!showBorder && !showIcons)*/) {
             return super.onTouchEvent(event);
         }
 
@@ -326,8 +324,10 @@ public class StickerView extends FrameLayout {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                handleCurrentMode(event);
-                invalidate();
+                if (showBorder && showIcons) {
+                    handleCurrentMode(event);
+                    invalidate();
+                }
                 break;
 
             case MotionEvent.ACTION_UP:

@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -90,18 +89,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStickerAdded(@NonNull final Sticker sticker) {
                 Log.d(TAG, "onStickerAdded");
-                if (sticker instanceof TextSticker) {
-                    ((TextSticker) sticker).resizeText();
-                    stickerView.replace(sticker);
-                    stickerView.invalidate();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((TextSticker) sticker).setTextSize(80.9804f);
-                            stickerView.invalidate();
-                        }
-                    }, 200);
-                }
+//                if (sticker instanceof TextSticker) {
+//                    ((TextSticker) sticker).resizeText();
+//                    stickerView.replace(sticker);
+//                    stickerView.invalidate();
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ((TextSticker) sticker).setTextSize(80.9804f);
+//                            stickerView.invalidate();
+//                        }
+//                    }, 200);
+//                }
             }
 
             @Override
