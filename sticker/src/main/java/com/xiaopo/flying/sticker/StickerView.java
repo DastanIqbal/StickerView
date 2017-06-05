@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -280,7 +281,12 @@ public class StickerView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (locked) return super.onInterceptTouchEvent(ev);
+        if (locked) {
+            if (onStickerOperationListener != null) {
+                onStickerOperationListener.onStickerClicked(handlingSticker);
+            }
+            return super.onInterceptTouchEvent(ev);
+        }
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -715,6 +721,19 @@ public class StickerView extends FrameLayout {
 
     public boolean removeCurrentSticker() {
         return remove(handlingSticker);
+    }
+
+    public void editCurrentSticker(String text, int textColor, String textFont) {
+        if (handlingSticker instanceof TextSticker) {
+            TextSticker textSticker = (TextSticker) handlingSticker;
+            textSticker.setText(text);
+            textSticker.setTextColor(textColor);
+            if (!TextUtils.isEmpty(textFont))
+                textSticker.setTypefaceFromFile(textFont);
+            textSticker.resizeText();
+            replace(textSticker);
+            invalidate();
+        }
     }
 
     public void removeAllStickers() {
