@@ -68,11 +68,6 @@ public class TextSticker extends Sticker {
      * Additional line spacing.
      */
     private float lineSpacingExtra = 0.0f;
-    private float[] textPoints = new float[8];
-    private Paint borderPaint = new Paint();
-    private float durationStart;
-    private float durationEnd;
-    private boolean select;
     private float textSize;
     private float calculatedTextSize;
     private String typefaceFilePath = "/system/fonts/Roboto-Medium.ttf";
@@ -82,6 +77,7 @@ public class TextSticker extends Sticker {
     }
 
     public TextSticker(@NonNull Context context, @Nullable Drawable drawable) {
+        super(context);
         this.context = context;
         this.drawable = drawable;
         if (drawable == null) {
@@ -97,6 +93,7 @@ public class TextSticker extends Sticker {
         textPaint.setTypeface(Typeface.create(typefaceFilePath, Typeface.NORMAL));
         textSize = maxTextSizePixels;
 
+        Paint borderPaint = new Paint();
         borderPaint.setAntiAlias(true);
         //borderPaint.setColor(Color.RED);
         borderPaint.setStyle(Paint.Style.FILL);
@@ -434,19 +431,6 @@ public class TextSticker extends Sticker {
         return staticLayout.getHeight();
     }
 
-    /**
-     * @return the number of pixels which scaledPixels corresponds to on the device.
-     */
-    private float convertSpToPx(float scaledPixels) {
-        float scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
-        return scaledPixels * scaledDensity;
-    }
-
-    private float convertPxToSp(float scaledPixels) {
-        float scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
-        return scaledPixels / scaledDensity;
-    }
-
     @Override
     public void setCenterPointXY(PointF centerPoint) {
         PointF pointF = new PointF();
@@ -488,22 +472,6 @@ public class TextSticker extends Sticker {
         PointF point = getTextCoordinate();
         int textLength = (int) Math.floor(textPaint.measureText(text, 0, text.length()));
         return new PointF(centerPointXY.x, centerPointXY.y);
-    }
-
-    public void setDurationStart(float durationStart) {
-        this.durationStart = durationStart;
-    }
-
-    public void setDurationEnd(float durationEnd) {
-        this.durationEnd = durationEnd;
-    }
-
-    public float getDurationStart() {
-        return durationStart;
-    }
-
-    public float getDurationEnd() {
-        return durationEnd;
     }
 
     public void setTextSize(float textSize) {

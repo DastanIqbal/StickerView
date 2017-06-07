@@ -1,5 +1,6 @@
 package com.xiaopo.flying.sticker;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
@@ -18,21 +19,16 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class Sticker {
 
+    private final Context context;
     private boolean manualXY = false;
     private PointF absolutePointF = new PointF();
     private float mainViewWidth, mainViewHeight;
     private int textSizeVal;
     private boolean isAdded;
+    private float durationStart;
+    private float durationEnd;
 
     public abstract void setCenterPointXY(PointF currentCenterPoint);
-
-    public void setIsAdded(boolean b) {
-        isAdded = b;
-    }
-
-    public boolean isAdded() {
-        return isAdded;
-    }
 
     @IntDef(flag = true, value = {
             Position.CENTER, Position.TOP, Position.BOTTOM, Position.LEFT, Position.RIGHT
@@ -55,6 +51,10 @@ public abstract class Sticker {
     private final Matrix matrix = new Matrix();
     private boolean isFlippedHorizontally;
     private boolean isFlippedVertically;
+
+    protected Sticker(Context context) {
+        this.context = context;
+    }
 
     public boolean isFlippedHorizontally() {
         return isFlippedHorizontally;
@@ -330,5 +330,47 @@ public abstract class Sticker {
 
     public int getTextSizeVal() {
         return textSizeVal;
+    }
+
+    public void setDurationStart(float durationStart) {
+        this.durationStart = durationStart;
+    }
+
+    public void setDurationEnd(float durationEnd) {
+        this.durationEnd = durationEnd;
+    }
+
+    public float getDurationStart() {
+        return durationStart;
+    }
+
+    public float getDurationEnd() {
+        return durationEnd;
+    }
+
+    /**
+     * @return the number of pixels which scaledPixels corresponds to on the device.
+     */
+    protected float convertSpToPx(float scaledPixels) {
+        float scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
+        return scaledPixels * scaledDensity;
+    }
+
+    protected float convertDpToPx(float scaledPixels) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return scaledPixels * density;
+    }
+
+    protected float convertPxToSp(float scaledPixels) {
+        float scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
+        return scaledPixels / scaledDensity;
+    }
+
+    public void setIsAdded(boolean b) {
+        isAdded = b;
+    }
+
+    public boolean isAdded() {
+        return isAdded;
     }
 }
