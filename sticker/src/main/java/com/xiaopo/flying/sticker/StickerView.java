@@ -980,10 +980,9 @@ public class StickerView extends FrameLayout {
     }
 
     public void setSliderValues(float start, float end) {
-        if (handlingSticker instanceof TextSticker) {
-            TextSticker textSticker = (TextSticker) handlingSticker;
-            textSticker.setDurationStart(start);
-            textSticker.setDurationEnd(end);
+        if (handlingSticker != null) {
+            handlingSticker.setDurationStart(start);
+            handlingSticker.setDurationEnd(end);
         }
     }
 
