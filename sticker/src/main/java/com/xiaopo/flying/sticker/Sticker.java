@@ -17,7 +17,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * @author wupanjie
  */
-public abstract class Sticker {
+public abstract class Sticker implements Comparable<Sticker> {
 
     private final Context context;
     private boolean manualXY = false;
@@ -27,6 +27,7 @@ public abstract class Sticker {
     private boolean isAdded;
     private float durationStart;
     private float durationEnd;
+    private boolean isVisible=true;
 
     public abstract void setCenterPointXY(PointF currentCenterPoint);
 
@@ -372,5 +373,22 @@ public abstract class Sticker {
 
     public boolean isAdded() {
         return isAdded;
+    }
+
+    @Override
+    public int compareTo(@NonNull Sticker sticker) {
+        if (durationStart == sticker.durationStart)
+            return 0;
+        if (durationStart > sticker.durationStart)
+            return 1;
+        return -1;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }

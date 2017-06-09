@@ -17,7 +17,7 @@ public class DrawableSticker extends Sticker {
     private Rect realBounds;
     private PointF centerPointXY = new PointF();
     private String stickerPath;
-    private PointF size;
+    private PointF size = new PointF();
 
     public DrawableSticker(Context context, Drawable drawable) {
         super(context);
@@ -47,11 +47,13 @@ public class DrawableSticker extends Sticker {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        canvas.save();
-        canvas.concat(getMatrix());
-        drawable.setBounds(realBounds);
-        drawable.draw(canvas);
-        canvas.restore();
+        if (isVisible()) {
+            canvas.save();
+            canvas.concat(getMatrix());
+            drawable.setBounds(realBounds);
+            drawable.draw(canvas);
+            canvas.restore();
+        }
     }
 
     @NonNull

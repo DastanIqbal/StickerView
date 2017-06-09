@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Sticker View
@@ -69,8 +70,8 @@ public class StickerView extends FrameLayout {
     public static final int FLIP_HORIZONTALLY = 1;
     public static final int FLIP_VERTICALLY = 1 << 1;
 
-    private final List<Sticker> stickers = new ArrayList<>();
-    private final List<BitmapStickerIcon> icons = new ArrayList<>(4);
+    private final ArrayList<Sticker> stickers = new ArrayList<>();
+    private final ArrayList<BitmapStickerIcon> icons = new ArrayList<>(4);
 
     private final Paint borderPaint = new Paint();
     private final Paint borderLinePaint = new Paint();
@@ -975,8 +976,20 @@ public class StickerView extends FrameLayout {
     }
 
 
-    public List<Sticker> getStickers() {
+    public ArrayList<Sticker> getStickers() {
         return stickers;
+    }
+
+    public TreeMap<Float, Sticker> getStickersHashMap() {
+        Collections.sort(stickers);
+        TreeMap<Float, Sticker> hashMap = new TreeMap<>();
+        for (Sticker sticker : stickers) {
+            sticker.setVisible(false);
+            float truncateLast2Digit = (sticker.getDurationStart() - sticker.getDurationStart() % 100) / 100;
+            hashMap.put(truncateLast2Digit, sticker);
+        }
+        invalidate();
+        return hashMap;
     }
 
     public void setSliderValues(float start, float end) {
