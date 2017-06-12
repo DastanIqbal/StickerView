@@ -980,16 +980,30 @@ public class StickerView extends FrameLayout {
         return stickers;
     }
 
-    public TreeMap<Float, Sticker> getStickersHashMap() {
+    public TreeMap<Float, ArrayList<Sticker>> getStickersHashMap() {
         Collections.sort(stickers);
-        TreeMap<Float, Sticker> hashMap = new TreeMap<>();
+        TreeMap<Float, ArrayList<Sticker>> hashMap = new TreeMap<>();
         for (Sticker sticker : stickers) {
             sticker.setVisible(false);
             float truncateLast2Digit = (sticker.getDurationStart() - sticker.getDurationStart() % 100) / 100;
-            hashMap.put(truncateLast2Digit, sticker);
+            ArrayList<Sticker> exitStickers = hashMap.get(truncateLast2Digit);
+            if (exitStickers != null && exitStickers.size() > 0) {
+                exitStickers.add(sticker);
+                hashMap.put(truncateLast2Digit, exitStickers);
+            } else {
+                ArrayList<Sticker> stickerList = new ArrayList<>();
+                stickerList.add(sticker);
+                hashMap.put(truncateLast2Digit, stickerList);
+            }
         }
         invalidate();
         return hashMap;
+    }
+
+    public void showOrHideStickers(boolean isShow) {
+        for (Sticker sticker : stickers) {
+            sticker.setVisible(isShow);
+        }
     }
 
     public void setSliderValues(float start, float end) {
