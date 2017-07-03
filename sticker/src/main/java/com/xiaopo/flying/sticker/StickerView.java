@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
@@ -1043,5 +1044,16 @@ public class StickerView extends FrameLayout {
 
     public void doChangeSurface(boolean b) {
         this.doChangeSurface = b;
+    }
+
+    private ArrayList<View> viewList = new ArrayList<>();
+
+    public void addInViewList(View view) {
+        viewList.add(view);
+        addView(view);
+    }
+
+    public ArrayList<View> getViewStickers() {
+        return viewList;
     }
 }
